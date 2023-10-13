@@ -3,7 +3,6 @@ package logger
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 
@@ -12,16 +11,16 @@ import (
 
 var Logger *logrus.Logger
 
-func InitLog(baseDir string) (err error){
+func InitLog(baseDir string) (err error) {
 	Logger = logrus.New()
 
 	logDirPath := os.Getenv("LOG_DIR_PATH")
-	if logDirPath == ""{
-		log.SetOutput(os.Stdout)
+	if logDirPath == "" {
+		Logger.SetOutput(os.Stdout)
 		return nil
 	}
 
-	if !filepath.IsAbs(logDirPath){
+	if !filepath.IsAbs(logDirPath) {
 		logDirPath = filepath.Join(baseDir, logDirPath)
 	}
 
@@ -30,9 +29,9 @@ func InitLog(baseDir string) (err error){
 		return err
 	}
 
-	logFileName := fmt.Sprintf("%d",os.Getpid())
+	logFileName := fmt.Sprintf("%d", os.Getpid())
 
-	logFilePath, err:= filepath.Abs(filepath.Join(logDirPath, logFileName))
+	logFilePath, err := filepath.Abs(filepath.Join(logDirPath, logFileName))
 	if err != nil {
 		return err
 	}
@@ -44,6 +43,31 @@ func InitLog(baseDir string) (err error){
 
 	Logger.SetFormatter(&logrus.JSONFormatter{})
 	Logger.SetOutput(io.MultiWriter(os.Stdout, file))
+	Logger.SetLevel(logrus.InfoLevel)
 
 	return nil
+}
+
+func WithField(key string, value interface{}) *logrus.Entry {
+	return Logger.WithField(key, value)
+}
+
+func Info(args ...interface{}) {
+	Logger.Info(args...)
+}
+
+func Debug(args ...interface{}) {
+	Logger.Debug(args...)
+}
+
+func Warn(args ...interface{}) {
+	Logger.Warn(args...)
+}
+
+func Error(args ...interface{}) {
+	Logger.Error(args...)
+}
+
+func Panic(args ...interface{}) {
+	Logger.Panic(args...)
 }
