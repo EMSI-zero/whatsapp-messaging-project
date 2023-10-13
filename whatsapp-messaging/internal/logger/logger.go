@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -41,7 +42,7 @@ func InitLog(baseDir string) (err error) {
 		return err
 	}
 
-	formatter:= new(logrus.JSONFormatter)
+	formatter := new(logrus.JSONFormatter)
 	formatter.TimestampFormat = "2006-01-02 15:04:05"
 	Logger.SetFormatter(formatter)
 	Logger.SetOutput(io.MultiWriter(os.Stdout, file))
@@ -54,22 +55,27 @@ func WithField(key string, value interface{}) *logrus.Entry {
 	return Logger.WithField(key, value)
 }
 
-func Info(args ...interface{}) {
-	Logger.WithField("timestamp", ).Info(args...)
+func Info(ctx context.Context, args ...interface{}) {
+	userID := ctx.Value("user_id")
+	Logger.WithField("user_id", userID).Info(args...)
 }
 
-func Debug(args ...interface{}) {
-	Logger.WithField("timestamp", ).Debug(args...)
+func Debug(ctx context.Context, args ...interface{}) {
+	userID := ctx.Value("user_id")
+	Logger.WithField("user_id", userID).Debug(args...)
 }
 
-func Warn(args ...interface{}) {
-	Logger.WithField("timestamp", ).Warn(args...)
+func Warn(ctx context.Context, args ...interface{}) {
+	userID := ctx.Value("user_id")
+	Logger.WithField("user_id", userID).Warn(args...)
 }
 
-func Error(args ...interface{}) {
-	Logger.WithField("timestamp", ).Error(args...)
+func Error(ctx context.Context, args ...interface{}) {
+	userID := ctx.Value("user_id")
+	Logger.WithField("user_id", userID).Error(args...)
 }
 
-func Panic(args ...interface{}) {
-	Logger.WithField("timestamp", ).Panic(args...)
+func Panic(ctx context.Context, args ...interface{}) {
+	userID := ctx.Value("user_id")
+	Logger.WithField("user_id", userID).Panic(args...)
 }
