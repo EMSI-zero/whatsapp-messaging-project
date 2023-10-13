@@ -41,7 +41,9 @@ func InitLog(baseDir string) (err error) {
 		return err
 	}
 
-	Logger.SetFormatter(&logrus.JSONFormatter{})
+	formatter:= new(logrus.JSONFormatter)
+	formatter.TimestampFormat = "2006-01-02 15:04:05"
+	Logger.SetFormatter(formatter)
 	Logger.SetOutput(io.MultiWriter(os.Stdout, file))
 	Logger.SetLevel(logrus.InfoLevel)
 
@@ -53,21 +55,21 @@ func WithField(key string, value interface{}) *logrus.Entry {
 }
 
 func Info(args ...interface{}) {
-	Logger.Info(args...)
+	Logger.WithField("timestamp", ).Info(args...)
 }
 
 func Debug(args ...interface{}) {
-	Logger.Debug(args...)
+	Logger.WithField("timestamp", ).Debug(args...)
 }
 
 func Warn(args ...interface{}) {
-	Logger.Warn(args...)
+	Logger.WithField("timestamp", ).Warn(args...)
 }
 
 func Error(args ...interface{}) {
-	Logger.Error(args...)
+	Logger.WithField("timestamp", ).Error(args...)
 }
 
 func Panic(args ...interface{}) {
-	Logger.Panic(args...)
+	Logger.WithField("timestamp", ).Panic(args...)
 }
