@@ -117,18 +117,18 @@ func (cfg *dbConfig) buildConfigFromEnv() error {
 	return nil
 }
 
-func NewDBConn() (db *gorm.DB, err error) {
+func NewDBConn() (err error) {
 	fmt.Println("connecting to database")
 
 	cfg := &dbConfig{}
 	if err := cfg.buildConfigFromEnv(); err != nil {
-		return nil, fmt.Errorf("could not load config, %w", err)
+		return fmt.Errorf("could not load config, %w", err)
 	}
 
 	gormLogEnv := os.Getenv(LogGormEnv)
 	if gormLogEnv != "" {
 		if GormLog, err = strconv.ParseBool(gormLogEnv); err != nil {
-			return nil, fmt.Errorf("couldn't parse %v env value '%s': %w",
+			return fmt.Errorf("couldn't parse %v env value '%s': %w",
 				LogGormEnv, gormLogEnv, err)
 		}
 	} else {
@@ -137,19 +137,17 @@ func NewDBConn() (db *gorm.DB, err error) {
 
 	connStr := cfg.toConnStr()
 
-	db, err = gorm.Open(postgres.Open(connStr), &gorm.Config{
+	GormConnectionPool, err = gorm.Open(postgres.Open(connStr), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.LogLevel(cfg.LogLevel)),
 	})
 
-	GormConnectionPool = db
-
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	database, err := db.DB()
+	database, err := GormConnectionPool.DB()
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	database.SetMaxOpenConns(int(cfg.MaxOpenConnection))
@@ -161,5 +159,5 @@ func NewDBConn() (db *gorm.DB, err error) {
 		Colorful:                  false,
 	})
 
-	return db, nil
+	return nil
 }

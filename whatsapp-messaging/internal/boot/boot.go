@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"whatapp-messaging/internal/logger"
+	"whatapp-messaging/internal/repository/dbrepo"
+	"whatapp-messaging/internal/server/httpserver"
 
 	"github.com/joho/godotenv"
 )
@@ -14,15 +16,23 @@ import (
 var env_dir_flag string
 
 func Boot() error {
-	if err:= parseFlags();err != nil {
+	if err := parseFlags(); err != nil {
 		return err
 	}
 
-	if err:= initEnvFile(".env"); err != nil{
+	if err := initEnvFile(".env"); err != nil {
 		return err
 	}
 
-	if err:= logger.InitLog(env_dir_flag);err != nil {
+	if err := logger.InitLog(env_dir_flag); err != nil {
+		return err
+	}
+
+	if err := dbrepo.NewDBConn(); err != nil {
+		return err
+	}
+
+	if err := httpserver.StartServer(); err != nil {
 		return err
 	}
 
@@ -40,7 +50,7 @@ func parseFlags() error {
 	return nil
 }
 
-func initEnvFile(fileName string) error{
+func initEnvFile(fileName string) error {
 	fullPath := filepath.Join(env_dir_flag, fileName)
 	err := godotenv.Load(fullPath)
 	if err != nil {
