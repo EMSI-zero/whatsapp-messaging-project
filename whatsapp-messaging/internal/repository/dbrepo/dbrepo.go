@@ -1,6 +1,7 @@
 package dbrepo
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"os"
@@ -12,6 +13,7 @@ import (
 	"gorm.io/gorm/logger"
 )
 
+var DBConnectionPool *sql.DB
 var GormConnectionPool *gorm.DB
 
 type dbConfig struct {
@@ -27,8 +29,8 @@ type dbConfig struct {
 
 func (cfg dbConfig) toConnStr() string {
 	connString := fmt.Sprintf(
-		"host=%s port=%v dbname=%s user=%s password=%s sslmode=disable",
-		cfg.Host, cfg.Port, cfg.Database, cfg.User, cfg.Password)
+		"postgresql://%s:%s@%s:%d/%s?sslmode=disable",
+		cfg.User, cfg.Password, cfg.Host, cfg.Port, cfg.Database)
 
 	return connString
 }
@@ -137,7 +139,15 @@ func NewDBConn() (err error) {
 
 	connStr := cfg.toConnStr()
 
-	GormConnectionPool, err = gorm.Open(postgres.Open(connStr), &gorm.Config{
+	conn, err := sql.Open("postgres", connStr)
+	if err != nil {
+		return err
+	}
+
+	conn.SetMaxIdleConns(int(cfg.MaxIdleConnection))
+	conn.SetMaxOpenConns(int(cfg.MaxOpenConnection))
+
+	GormConnectionPool, err = gorm.Open(postgres.New(postgres.Config{Conn: conn}), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.LogLevel(cfg.LogLevel)),
 	})
 
@@ -145,13 +155,6 @@ func NewDBConn() (err error) {
 		return err
 	}
 
-	database, err := GormConnectionPool.DB()
-	if err != nil {
-		return err
-	}
-
-	database.SetMaxOpenConns(int(cfg.MaxOpenConnection))
-	database.SetMaxIdleConns(int(cfg.MaxIdleConnection))
 	GormDebugLogger = logger.New(log.Default(), logger.Config{
 		SlowThreshold:             365 * 24 * time.Hour,
 		LogLevel:                  logger.Info,

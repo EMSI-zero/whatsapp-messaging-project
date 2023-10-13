@@ -2,6 +2,7 @@ package dbrepo
 
 import (
 	"context"
+	"database/sql"
 
 	"gorm.io/gorm"
 )
@@ -21,4 +22,22 @@ func GetGormConn(ctx context.Context) (*gorm.DB, error) {
 	}
 
 	return db, nil
+}
+
+func GetDBConn(ctx context.Context) (*sql.Conn, error){
+	if DBConnectionPool == nil{
+		panic("no database connection found")
+	}
+
+	db,err := DBConnectionPool.Conn(ctx)
+	if err != nil {
+		return nil,err
+	}
+
+	return db, nil
+
+}
+
+func GetDBConnPool() (*sql.DB){
+	return DBConnectionPool
 }
