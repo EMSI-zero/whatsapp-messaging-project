@@ -9,6 +9,7 @@ import (
 	"whatapp-messaging/internal/logger"
 	"whatapp-messaging/internal/repository/dbrepo"
 	"whatapp-messaging/internal/server/httpserver"
+	"whatapp-messaging/services"
 
 	"github.com/joho/godotenv"
 )
@@ -29,6 +30,10 @@ func Boot() error {
 	}
 
 	if err := dbrepo.NewDBConn(); err != nil {
+		return err
+	}
+
+	if err := services.InitServices(); err != nil {
 		return err
 	}
 

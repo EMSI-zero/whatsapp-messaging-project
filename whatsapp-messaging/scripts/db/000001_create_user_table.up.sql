@@ -1,0 +1,4 @@
+CREATE TABLE user(
+    user_id BIGINT PRIMARY KEY,
+    jid VARCHAR(150) UNIQUE
+);
