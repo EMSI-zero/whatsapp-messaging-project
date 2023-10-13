@@ -39,7 +39,7 @@ func (cfg redisConfig) toConnOptions() *redis.Options {
 }
 
 func NewRedisClient() error {
-	logger.Info("connecting to redis cache...")
+	logger.Info(context.Background(), "connecting to redis cache...")
 
 	cfg := &redisConfig{}
 	if err := cfg.buildConfigFromEnv(); err != nil {
@@ -62,15 +62,15 @@ func (c dbCache[K, V]) MakeCache(ExpTime time.Duration, loader Loader[K, V]) *db
 	}
 }
 
-func (c dbCache[K, V]) Read(ctx context.Context, key K) (value V,err error) {
+func (c dbCache[K, V]) Read(ctx context.Context, key K) (value V, err error) {
 	if c.Loader == nil {
-		logger.Panic("cache is not initialized")
+		logger.Panic(ctx, "cache is not initialized")
 	}
 
-	if err = c.rCache.Get(ctx, fmt.Sprint(key) , value); err == nil{
+	if err = c.rCache.Get(ctx, fmt.Sprint(key), value); err == nil {
 		return value, nil
 	}
-	logger.Error(err)
+	logger.Error(ctx, err)
 
 	value, err = c.Loader(ctx, key)
 	if err != nil {
