@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"time"
-	"whatapp-messaging/internal/logger"
+	"whatsapp-messaging/internal/logger"
 
 	"github.com/go-redis/cache/v9"
 	"github.com/redis/go-redis/v9"

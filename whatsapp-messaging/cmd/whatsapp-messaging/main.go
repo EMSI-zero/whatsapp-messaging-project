@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"whatapp-messaging/internal/boot"
+	"whatsapp-messaging/internal/boot"
 )
 
 func main() {

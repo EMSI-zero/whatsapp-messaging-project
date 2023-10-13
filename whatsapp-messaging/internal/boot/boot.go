@@ -6,10 +6,10 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"whatapp-messaging/internal/logger"
-	"whatapp-messaging/internal/repository/dbrepo"
-	"whatapp-messaging/internal/server/httpserver"
-	"whatapp-messaging/services"
+	"whatsapp-messaging/internal/logger"
+	"whatsapp-messaging/internal/repository/dbrepo"
+	"whatsapp-messaging/internal/server/httpserver"
+	"whatsapp-messaging/services"
 
 	"github.com/joho/godotenv"
 )

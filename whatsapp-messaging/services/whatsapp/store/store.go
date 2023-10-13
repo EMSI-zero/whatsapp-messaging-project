@@ -1,8 +1,8 @@
 package store
 
 import (
-	"whatapp-messaging/internal/repository/dbrepo"
-	"whatapp-messaging/services"
+	"whatsapp-messaging/internal/repository/dbrepo"
+	"whatsapp-messaging/services"
 
 	"go.mau.fi/whatsmeow/store/sqlstore"
 )
@@ -13,15 +13,15 @@ func init() {
 	services.RegisterService(InitContainer)
 }
 
-func InitContainer() error{
+func InitContainer() error {
 	dataStoreContainer = sqlstore.NewWithDB(dbrepo.GetDBConnPool(), "postgres", nil)
-	err:= dataStoreContainer.Upgrade()
+	err := dataStoreContainer.Upgrade()
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func GetDataStore() *sqlstore.Container{
+func GetDataStore() *sqlstore.Container {
 	return dataStoreContainer
 }

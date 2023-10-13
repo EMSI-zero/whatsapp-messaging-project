@@ -8,8 +8,8 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-	"whatapp-messaging/api/rest"
-	"whatapp-messaging/internal/logger"
+	"whatsapp-messaging/api/rest"
+	"whatsapp-messaging/internal/logger"
 
 	"github.com/gin-gonic/gin"
 )

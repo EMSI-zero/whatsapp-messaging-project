@@ -1,4 +1,4 @@
-module whatapp-messaging
+module whatsapp-messaging
 
 go 1.18
 
