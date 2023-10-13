@@ -18,8 +18,9 @@ var EnvListenAddress = "SRV_LISTEN_ADDRESS"
 
 func StartServer() error {
 	engine := gin.Default()
-	gin.SetMode(gin.ReleaseMode)
-	rest.Addroutes(engine.RouterGroup)
+	// gin.SetMode(gin.ReleaseMode)
+	rest.AddRoutes(&engine.RouterGroup)
+
 
 	address, err := GetListenAddressEnv()
 	if err != nil {
