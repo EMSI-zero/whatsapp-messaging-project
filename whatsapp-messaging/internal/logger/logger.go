@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"whatsapp-messaging/internal/contextmanager"
 
 	"github.com/sirupsen/logrus"
 )
@@ -56,26 +57,26 @@ func WithField(key string, value interface{}) *logrus.Entry {
 }
 
 func Info(ctx context.Context, args ...interface{}) {
-	userID := ctx.Value("user_id")
+	userID := ctx.Value(&contextmanager.UserContextKey{})
 	Logger.WithField("user_id", userID).Info(args...)
 }
 
 func Debug(ctx context.Context, args ...interface{}) {
-	userID := ctx.Value("user_id")
+	userID := ctx.Value(&contextmanager.UserContextKey{})
 	Logger.WithField("user_id", userID).Debug(args...)
 }
 
 func Warn(ctx context.Context, args ...interface{}) {
-	userID := ctx.Value("user_id")
+	userID := ctx.Value(&contextmanager.UserContextKey{})
 	Logger.WithField("user_id", userID).Warn(args...)
 }
 
 func Error(ctx context.Context, args ...interface{}) {
-	userID := ctx.Value("user_id")
+	userID := ctx.Value(&contextmanager.UserContextKey{})
 	Logger.WithField("user_id", userID).Error(args...)
 }
 
 func Panic(ctx context.Context, args ...interface{}) {
-	userID := ctx.Value("user_id")
+	userID := ctx.Value(&contextmanager.UserContextKey{})
 	Logger.WithField("user_id", userID).Panic(args...)
 }
