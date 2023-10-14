@@ -25,6 +25,9 @@ func SetJID(ctx context.Context, jid string) error {
 	return nil
 }
 
+type UserContextKey struct{}
+type JIDContextKey struct {}
+
 func NewUserContext(ctx context.Context, userID int64, jid string) (context.Context, error) {
 	if userID == 0 {
 		err := fmt.Errorf("no user id found")
@@ -32,9 +35,9 @@ func NewUserContext(ctx context.Context, userID int64, jid string) (context.Cont
 		return nil, err
 	}
 
-	ctx = context.WithValue(ctx, "user_id", userID)
+	ctx = context.WithValue(ctx, &UserContextKey{}, userID)
 	if jid != "" {
-		ctx = context.WithValue(ctx, "jid", jid)
+		ctx = context.WithValue(ctx, &JIDContextKey{}, jid)
 	}
 
 	return ctx, nil
