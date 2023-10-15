@@ -120,7 +120,9 @@ func Reconnect(ctx context.Context) error {
 	client := WhatsappClients[jid]
 	client.Disconnect()
 	if client.Store.ID == nil {
-		return errors.New("whatsApp client store id is empty.")
+		err := errors.New("whatsApp client store id is empty")
+		logger.Error(ctx, err)
+		return err
 	}
 
 	err := client.Connect()
