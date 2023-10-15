@@ -9,9 +9,9 @@ import (
 	"whatsapp-messaging/internal/repository/dbrepo"
 )
 
-var UserJIDCache *cacherepo.DBCache[int64, string] = cacherepo.MakeCache(1*time.Minute, GetJID)
+var UserJIDCache *cacherepo.DBCache[int64, string] = cacherepo.MakeCache(1*time.Minute, LoadJID)
 
-func GetJID(ctx context.Context, userID int64) (string, error) {
+func LoadJID(ctx context.Context, userID int64) (string, error) {
 	db, err := dbrepo.GetGormConn(ctx)
 	if err != nil {
 		return "", err
@@ -44,4 +44,9 @@ func SetJID(ctx context.Context, jid string) error {
 	}
 
 	return nil
+}
+
+
+func GetJID(ctx context.Context, userId int64) (jid string,err error){
+	return UserJIDCache.Read(ctx, userId)
 }

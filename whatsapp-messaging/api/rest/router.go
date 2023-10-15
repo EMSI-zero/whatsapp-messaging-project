@@ -4,14 +4,18 @@ import (
 	"net/http"
 	"whatsapp-messaging/api/rest/auth"
 	"whatsapp-messaging/api/rest/login"
+	"whatsapp-messaging/api/rest/user"
 
 	"github.com/gin-gonic/gin"
 )
 
 func AddRoutes(parent *gin.RouterGroup) {
-	parent.Group("/api", APIHandler())
+	api := parent.Group("/api")
 
-	login.AddRoutes(parent)
+	userRouteGroup:= user.AddRoutes(api)
+
+	authenticated := userRouteGroup.Group("/:user_id", APIHandler())
+	login.AddRoutes(authenticated)
 }
 
 func APIHandler() gin.HandlerFunc {
