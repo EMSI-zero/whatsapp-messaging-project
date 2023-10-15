@@ -148,6 +148,11 @@ func NewDBConn() (err error) {
 	conn.SetMaxIdleConns(int(cfg.MaxIdleConnection))
 	conn.SetMaxOpenConns(int(cfg.MaxOpenConnection))
 
+	if err := conn.Ping(); err != nil {
+		log.Print(err)
+		return err
+	}
+
 	GormConnectionPool, err = gorm.Open(postgres.New(postgres.Config{Conn: conn}), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.LogLevel(cfg.LogLevel)),
 	})

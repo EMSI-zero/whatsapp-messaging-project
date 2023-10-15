@@ -16,9 +16,12 @@ func init() {
 }
 
 func InitContainer() error {
-	dataStoreContainer = sqlstore.NewWithDB(dbrepo.GetDBConnPool(), "postgres", nil)
+	db := dbrepo.GetDBConnPool()
+	logger.Info(context.Background(), db)
+	dataStoreContainer = sqlstore.NewWithDB(db, "postgres", nil)
 	
 	logger.Info(context.Background(), "upgrading database migrations...")
+	logger.Info(context.Background(), dataStoreContainer)
 	err := dataStoreContainer.Upgrade()
 	if err != nil {
 		logger.Error(context.Background(), err)
