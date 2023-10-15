@@ -3,6 +3,7 @@ package cacherepo
 import (
 	"context"
 	"fmt"
+	"os"
 	"time"
 	"whatsapp-messaging/internal/logger"
 
@@ -12,7 +13,11 @@ import (
 
 var redisConnection *redis.Client
 
-type dbCache[K comparable, V any] struct {
+var CacheHost string = "CACHE_HOST"
+var CacheSecret string = "CACHE_SECRET"
+var CachePort string = "CACHE_PORT"
+
+type DBCache[K comparable, V any] struct {
 	rCache *cache.Cache
 	Loader Loader[K, V]
 	TTL    time.Duration
@@ -26,7 +31,22 @@ type redisConfig struct {
 	Password string
 }
 
-func (cfg redisConfig) buildConfigFromEnv() error {
+func (cfg redisConfig) buildConfigFromEnv() (err error) {
+	cfg.Address = os.Getenv(CacheHost)
+	if cfg.Address == "" {
+		return fmt.Errorf("%v env must be specified: cache address", CacheHost)
+	}
+
+	cfg.Port = os.Getenv(CachePort)
+	if cfg.Port == "" {
+		return fmt.Errorf("%v env must be specified: cache port", CachePort)
+	}
+
+	cfg.Password = os.Getenv(CacheSecret)
+	if cfg.Password == "" {
+		return fmt.Errorf("%v env must be specified: cache password", CacheSecret)
+	}
+
 	return nil
 }
 
@@ -52,8 +72,8 @@ func NewRedisClient() error {
 	return nil
 }
 
-func (c dbCache[K, V]) MakeCache(ExpTime time.Duration, loader Loader[K, V]) *dbCache[K, V] {
-	return &dbCache[K, V]{
+func MakeCache[K comparable, V any](ExpTime time.Duration, loader Loader[K, V]) *DBCache[K, V] {
+	return &DBCache[K, V]{
 		rCache: cache.New(&cache.Options{
 			Redis: redisConnection,
 		}),
@@ -62,7 +82,7 @@ func (c dbCache[K, V]) MakeCache(ExpTime time.Duration, loader Loader[K, V]) *db
 	}
 }
 
-func (c dbCache[K, V]) Read(ctx context.Context, key K) (value V, err error) {
+func (c DBCache[K, V]) Read(ctx context.Context, key K) (value V, err error) {
 	if c.Loader == nil {
 		logger.Panic(ctx, "cache is not initialized")
 	}

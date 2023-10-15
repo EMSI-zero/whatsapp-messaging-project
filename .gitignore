@@ -1,1 +1,3 @@
 whatsapp-messaging/log/*
+whatsapp-messaging/.env
+whatsapp-messaging/.env.production
