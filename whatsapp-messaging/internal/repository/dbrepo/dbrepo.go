@@ -145,6 +145,8 @@ func NewDBConn() (err error) {
 		return err
 	}
 
+	DBConnectionPool = conn
+
 	conn.SetMaxIdleConns(int(cfg.MaxIdleConnection))
 	conn.SetMaxOpenConns(int(cfg.MaxOpenConnection))
 
