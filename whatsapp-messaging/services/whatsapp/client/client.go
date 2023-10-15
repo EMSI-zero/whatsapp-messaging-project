@@ -3,7 +3,7 @@ package client
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
+	"errors"
 	"whatsapp-messaging/internal/contextmanager"
 	"whatsapp-messaging/internal/logger"
 	"whatsapp-messaging/services/whatsapp/store"
@@ -12,6 +12,7 @@ import (
 
 	"go.mau.fi/whatsmeow"
 	wmstore "go.mau.fi/whatsmeow/store"
+	"go.mau.fi/whatsmeow/types"
 )
 
 var WhatsappClients map[string]*whatsmeow.Client
@@ -28,7 +29,7 @@ func InitClientWithNewDevice(ctx context.Context) error {
 func InitClient(ctx context.Context, device *wmstore.Device) error {
 	jid := ctx.Value(contextmanager.JIDContextKey{}).(string)
 	if jid == "" {
-		err := fmt.Errorf("no jid found")
+		err := errors.New("no jid found")
 		logger.Error(ctx, err)
 		return err
 	}
@@ -61,4 +62,39 @@ func WhatsAppGenerateQR(qrChan <-chan whatsmeow.QRChannelItem) (string, int) {
 	qrPNG, _ := qrCode.Encode(qrTemp, qrCode.Medium, 256)
 
 	return base64.StdEncoding.EncodeToString(qrPNG), <-qrChanTimeout
+}
+
+func LoginClient(ctx context.Context) (string, int, error) {
+	jid := ctx.Value(contextmanager.JIDContextKey{}).(string)
+	if jid == "" {
+		err := errors.New("no jid found")
+		logger.Error(ctx, err)
+		return "", 0, err
+	}
+
+	if WhatsappClients[jid] == nil {
+		err := errors.New("no valid clients")
+		logger.Error(ctx, err)
+		return "", 0, err
+	}
+
+	client := WhatsappClients[jid]
+	client.Disconnect()
+
+	if client.Store.ID == nil {
+		newQRChannel, _ := client.GetQRChannel(context.Background())
+		err := client.Connect()
+		if err != nil {
+			logger.Error(ctx, err)
+			return "", 0, err
+		}
+
+		qrImage, qrTimeout := WhatsAppGenerateQR(newQRChannel)
+
+		_ = client.SendPresence(types.PresenceAvailable)
+
+		return "data:image/png;base64," + qrImage, qrTimeout, nil
+	}
+
+	return "", 0, nil
 }
