@@ -14,20 +14,20 @@ func NewUserContext(ctx context.Context, userID int64, jid string) (context.Cont
 		return nil, err
 	}
 
-	ctx = context.WithValue(ctx, &UserContextKey{}, userID)
+	ctx = context.WithValue(ctx, UserContextKey{}, userID)
 	if jid != "" {
-		ctx = context.WithValue(ctx, &JIDContextKey{}, jid)
+		ctx = context.WithValue(ctx, JIDContextKey{}, jid)
 	}
 
 	return ctx, nil
 }
 
 func ReadUserContext(ctx context.Context) (userId int64, jid string, err error) {
-	userIdValue := ctx.Value(&UserContextKey{})
+	userIdValue := ctx.Value(UserContextKey{})
 	if userIdValue == nil {
 		return 0, "", fmt.Errorf("no user id found")
 	}
-	jidValue := ctx.Value(&JIDContextKey{})
+	jidValue := ctx.Value(JIDContextKey{})
 
 	return userIdValue.(int64), jidValue.(string), nil
 }

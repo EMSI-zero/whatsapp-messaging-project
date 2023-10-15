@@ -1,6 +1,8 @@
 package store
 
 import (
+	"context"
+	"whatsapp-messaging/internal/logger"
 	"whatsapp-messaging/internal/repository/dbrepo"
 	"whatsapp-messaging/services"
 
@@ -15,10 +17,15 @@ func init() {
 
 func InitContainer() error {
 	dataStoreContainer = sqlstore.NewWithDB(dbrepo.GetDBConnPool(), "postgres", nil)
+	
+	logger.Info(context.Background(), "upgrading database migrations...")
 	err := dataStoreContainer.Upgrade()
 	if err != nil {
+		logger.Error(context.Background(), err)
 		return err
 	}
+	logger.Info(context.Background(), "database migrations upgraded.")
+
 	return nil
 }
 
