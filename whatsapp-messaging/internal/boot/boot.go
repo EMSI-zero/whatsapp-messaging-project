@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"whatsapp-messaging/internal/logger"
+	"whatsapp-messaging/internal/repository/cacherepo"
 	"whatsapp-messaging/internal/repository/dbrepo"
 	"whatsapp-messaging/internal/server/httpserver"
 	"whatsapp-messaging/services"
@@ -30,6 +31,10 @@ func Boot() error {
 	}
 
 	if err := dbrepo.NewDBConn(); err != nil {
+		return err
+	}
+
+	if err := cacherepo.NewRedisClient(); err != nil {
 		return err
 	}
 
