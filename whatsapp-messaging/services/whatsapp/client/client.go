@@ -96,5 +96,39 @@ func LoginClient(ctx context.Context) (string, int, error) {
 		return "data:image/png;base64," + qrImage, qrTimeout, nil
 	}
 
+	err := Reconnect(ctx)
+	if err != nil {
+		return "", 0, err
+	}
 	return "", 0, nil
+}
+
+func Reconnect(ctx context.Context) error {
+	jid := ctx.Value(contextmanager.JIDContextKey{}).(string)
+	if jid == "" {
+		err := errors.New("no jid found")
+		logger.Error(ctx, err)
+		return err
+	}
+
+	if WhatsappClients[jid] == nil {
+		err := errors.New("no valid clients")
+		logger.Error(ctx, err)
+		return err
+	}
+
+	client := WhatsappClients[jid]
+	client.Disconnect()
+	if client.Store.ID == nil {
+		return errors.New("whatsApp client store id is empty.")
+	}
+
+	err := client.Connect()
+	if err != nil {
+		return err
+	}
+
+	_ = client.SendPresence(types.PresenceAvailable)
+
+	return nil
 }
